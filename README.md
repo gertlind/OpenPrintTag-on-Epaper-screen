@@ -1,5 +1,5 @@
 # <center>NFC to OpenEpaperDisplay</center>
+<p align="center">
+  <img src="https://github.com/gertlind/OpenPrintTag-on-Epaper-screen/blob/main/current_tag.jpg" width='70%/>
+</p>
 <BR>
-<center>
- <img src=['path/to/image'](https://github.com/gertlind/OpenPrintTag-on-Epaper-screen/blob/main/current_tag.jpg") width='70%' />
-</center>
