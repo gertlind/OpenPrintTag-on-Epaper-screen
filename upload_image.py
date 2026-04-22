@@ -2,7 +2,7 @@ from pathlib import Path
 import requests
 
 OPENEPAPER_HOST = "192.168.123.90"
-TAG_MAC = "000001848805411C"
+TAG_MAC = "00000XXXXXXXX"
 
 BASE_DIR = Path(__file__).resolve().parent
 IMAGE_FILE = BASE_DIR / "current_tag.jpg"   # byt till .png om det är den du sparar
