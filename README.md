@@ -1,3 +1,6 @@
 # NFC to OpenEpaperDisplay
 <BR>
-<img src="[https://via.placeholder.com/150](https://github.com/gertlind/OpenPrintTag-on-Epaper-screen/blob/main/current_tag.jpg)" alt="placeholder" width="50%" height="50%">
+<p align="center">
+  <img src="http://some_place.com/image.png" />
+</p>
+<img src="[https://github.com/gertlind/OpenPrintTag-on-Epaper-screen/blob/main/current_tag.jpg" alt="placeholder" width="50%" height="50%">
