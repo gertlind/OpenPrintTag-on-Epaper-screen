@@ -2,4 +2,4 @@
 <BR>
 <center>
 ![Filament DB](current_tag.jpg)
-</center>
+<img src="https://via.placeholder.com/150" alt="placeholder" width="50%" height="50%">
