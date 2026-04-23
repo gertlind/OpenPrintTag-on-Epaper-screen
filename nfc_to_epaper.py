@@ -6,8 +6,9 @@ import cbor2
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 import datetime
+import time
 
-API_BASE = "http://localhost:3456/api"
+API_BASE = "http://127.0.0.1:3000/api"
 
 OPENEPAPER_HOST = "192.168.123.90"
 TAG_MAC = "00EE6XXXXXXXXX"
@@ -22,12 +23,12 @@ WIDTH = 960
 HEIGHT = 672
 
 FONT_REG_PATHS = [
-    "/System/Library/Fonts/Supplemental/Arial.ttf",
-    "/System/Library/Fonts/Supplemental/Helvetica.ttc",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
 ]
 FONT_BOLD_PATHS = [
-    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Helvetica.ttc",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",
 ]
 
 
@@ -254,8 +255,8 @@ def render_filament_image(filament, outfile: Path):
     net_text = f"{net_weight} g" if net_weight is not None else "-"
     spool_text = f"{spool_weight} g" if spool_weight is not None else "-"
     remaining_text = f"{weight_left} g" if weight_left is not None else "-"
-    if percent_left is not None:
-        remaining_text = f"{remaining_text} ({percent_left:.0f}%)"
+    # if percent_left is not None:
+    #    remaining_text = f"{remaining_text} ({percent_left:.0f}%)"
     length_text = f"{length_left} m" if length_left is not None else "-"
 
     draw_metric_box(draw, 58, box_y, box_w, 104, "Net Filament", net_text, font_box_title, font_box_value)
@@ -264,11 +265,35 @@ def render_filament_image(filament, outfile: Path):
     draw_metric_box(draw, 58 + 3 * (box_w + gap), box_y, box_w, 104, "Length Left", length_text, font_box_title, font_box_value)
 
     # Progress bar
-    bar_x1, bar_y1, bar_x2, bar_y2 = 58, 568, 884, 590
-    draw.rounded_rectangle((bar_x1, bar_y1, bar_x2, bar_y2), radius=10, fill=225)
-    if percent_left is not None:
-        fill_w = int((bar_x2 - bar_x1) * max(0, min(percent_left, 100)) / 100)
-        draw.rounded_rectangle((bar_x1, bar_y1, bar_x1 + fill_w, bar_y2), radius=10, fill=0)
+    #bar_x1, bar_y1, bar_x2, bar_y2 = 58, 568, 884, 590
+    #draw.rounded_rectangle((bar_x1, bar_y1, bar_x2, bar_y2), radius=10, fill=225)
+    #if percent_left is not None:
+    #    fill_w = int((bar_x2 - bar_x1) * max(0, min(percent_left, 100)) / 100)
+    #    draw.rounded_rectangle((bar_x1, bar_y1, bar_x1 + fill_w, bar_y2), radius=10, fill=0)
+    #bar_width = 826
+    #bar_height = 22
+    #bar_x1 = (WIDTH - bar_width) // 2
+    #bar_x2 = bar_x1 + bar_width
+    #bar_y1 = 568
+    #bar_y2 = bar_y1 + bar_height
+
+# Segmenterad bar
+    #segments = 16
+    #gap = 3
+    #segment_width = (bar_width - (segments - 1) * gap) // segments
+    #if percent_left is not None:
+    #    filled_segments = int((percent_left / 100) * segments)
+    #else:
+    #    filled_segments = 0
+    #
+    #for i in range(segments):
+    #    x1 = bar_x1 + i * (segment_width + gap)
+    #    x2 = x1 + segment_width
+    #    if i < filled_segments:
+    #        fill = 0
+    #    else:
+    #        fill = 200
+    #    draw.rounded_rectangle((x1, bar_y1, x2, bar_y2), radius=4, fill=fill)
 
     # Footer
     now_text = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -342,13 +367,33 @@ def read_tag_and_fetch_filament():
 
 
 def main():
-    filament = read_tag_and_fetch_filament()
-    if filament is None:
+    print("NFC service started", flush=True)
+    last_instance_id = None
+    last_seen_time = 0
+
+    while True:
+        try:
+            filament = read_tag_and_fetch_filament()
+            if filament is None:
+                time.sleep(1)
+                continue
+            instance_id = filament.get("instanceId")
+            now = time.time()
+
+            if instance_id == last_instance_id and (now - last_seen_time) < 10:
+                time.sleep(1)
+                continue
+            print(f"Tag detected. processing instanceId={instance_id}", flush=True)
+           
+            render_filament_image(filament, OUTPUT_IMAGE)
+            upload_image()
+
+            time.sleep(2)
+
+        except Exception as e:
+            print(f"Error in main loop {e}", flush=True)
+            time.sleep(2)
         return
-
-    render_filament_image(filament, OUTPUT_IMAGE)
-    upload_image()
-
 
 if __name__ == "__main__":
     main()
