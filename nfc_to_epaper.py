@@ -11,7 +11,7 @@ import time
 API_BASE = "http://127.0.0.1:3000/api"
 
 OPENEPAPER_HOST = "192.168.123.90"
-TAG_MAC = "00EE6XXXXXXXXX"
+TAG_MAC = "00EE6933F1335F55"
 
 GET_UID = [0xFF, 0xCA, 0x00, 0x00, 0x00]
 MIME = b"application/vnd.openprinttag"
